@@ -11,13 +11,13 @@ pip install .
 To install the package directly into another project via pip, point to the repository URL:
 
 ```bash
-pip install "git+https://github.com/your-org/python-utils.git@main"
+pip install "git+https://github.com/laziness-coders/python-utils.git@main"
 ```
 
 In a `requirements.txt` file you can pin a version or branch:
 
 ```
-python-utils @ git+https://github.com/your-org/python-utils.git@v1.0.0
+python-utils @ git+https://github.com/laziness-coders/python-utils.git@v1.0.0
 ```
 
 ### Why `pyproject.toml`?

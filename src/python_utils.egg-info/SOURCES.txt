@@ -1,9 +1,0 @@
-README.md
-pyproject.toml
-src/python_utils/__init__.py
-src/python_utils/logger.py
-src/python_utils.egg-info/PKG-INFO
-src/python_utils.egg-info/SOURCES.txt
-src/python_utils.egg-info/dependency_links.txt
-src/python_utils.egg-info/requires.txt
-src/python_utils.egg-info/top_level.txt

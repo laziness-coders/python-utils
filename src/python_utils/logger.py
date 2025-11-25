@@ -1,6 +1,6 @@
 """
-Centralized logging module for GSC WooCommerce price update system.
-Provides a unified send_log function for sending logs to the remote logging API.
+Centralized logging utility to send log messages to a remote logging API.
+Provides functions for different log levels: info, warning, error, and critical.
 """
 
 from __future__ import annotations

@@ -4,20 +4,63 @@ Utility helpers for Python projects. The initial release provides a centralized 
 
 ## Installation
 
-```bash
-pip install .
-```
+### Using a Virtual Environment (Recommended)
 
-To install the package directly into another project via pip, point to the repository URL:
+On macOS and modern Linux systems, Python environments are externally managed. Always use a virtual environment:
 
 ```bash
+# Create a virtual environment
+python3 -m venv venv
+
+# Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+# venv\Scripts\activate
+
+# Install the package
 pip install "git+https://github.com/laziness-coders/python-utils.git@main"
 ```
 
-In a `requirements.txt` file you can pin a version or branch:
+**Note:** If you're not using a virtual environment and your system has both Python 2 and Python 3, use `pip3` instead of `pip`:
+
+```bash
+pip3 install "git+https://github.com/laziness-coders/python-utils.git@main"
+```
+
+### Local Development Installation
+
+If you've cloned the repository locally:
+
+```bash
+# Activate your virtual environment first
+source venv/bin/activate
+
+# Install in editable mode (changes reflect immediately)
+pip install -e .
+
+# Or install normally
+pip install .
+```
+
+### In requirements.txt
+
+Add to your project's `requirements.txt`:
 
 ```
-python-utils @ git+https://github.com/laziness-coders/python-utils.git@v1.0.0
+python-utils @ git+https://github.com/laziness-coders/python-utils.git@main
+```
+
+Or pin to a specific version/tag:
+
+```
+python-utils @ git+https://github.com/laziness-coders/python-utils.git@v0.1.0
+```
+
+Then install with:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ### Why `pyproject.toml`?
@@ -58,6 +101,12 @@ send_error("Could not fetch product catalog")
 Run the included example script after setting your logging endpoint environment variables:
 
 ```bash
+# Make sure you're in a virtual environment
+source venv/bin/activate
+
+# Install the package
 pip install .
+
+# Run the example
 LOG_API_URL="https://logging.example.com/logs" LOG_API_KEY="your-api-key" python examples/basic_logging.py
 ```

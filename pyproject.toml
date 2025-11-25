@@ -19,7 +19,4 @@ Homepage = "https://example.com/python-utils"
 Repository = "https://example.com/python-utils.git"
 
 [tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools]
-package-dir = {"" = "src"}
+where = ["."]

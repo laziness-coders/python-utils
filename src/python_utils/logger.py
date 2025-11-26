@@ -9,18 +9,22 @@ import hashlib
 import inspect
 import json
 import os
+import traceback
 from datetime import datetime
 
 import requests
 
 
-def send_log(level: str, message: str) -> bool:
+def send_log(
+    level: str,
+    message: str | Exception,
+) -> bool:
     """
     Send log message to remote logging API.
 
     Args:
         level (str): Log level (e.g., 'info', 'warning', 'error', 'critical')
-        message (str): Log message to send
+        message (str | Exception): Log message to send or exception to format and log
 
     Returns:
         bool: True if log was sent successfully, False otherwise
@@ -32,19 +36,13 @@ def send_log(level: str, message: str) -> bool:
         print("Error: LOG_API_URL and LOG_API_KEY environment variables must be set")
         return False
 
-    frame = inspect.currentframe().f_back
-    while frame and frame.f_code.co_filename.endswith("logger.py"):
-        frame = frame.f_back
-
-    if frame:
-        filepath = frame.f_code.co_filename
-        line_number = frame.f_lineno
+    if isinstance(message, Exception):
+        formatted_message = format_exception_message(message)
     else:
-        filepath = "unknown"
-        line_number = 0
+        formatted_message = format_string_message(message)
 
-    dedup_key = hashlib.md5(f"{filepath}:{line_number}".encode("utf-8")).hexdigest()
-    formatted_message = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [{filepath}:{line_number}] {message}"
+    dedup_key = hashlib.md5(f"{formatted_message}".encode("utf-8")).hexdigest()
+    formatted_message = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {formatted_message}"
 
     payload = {
         "level": level,
@@ -72,25 +70,73 @@ def send_log(level: str, message: str) -> bool:
         return False
 
 
-def send_info(message: str) -> bool:
+def send_info(message: str | Exception) -> bool:
     """Send info level log message."""
 
     return send_log("info", message)
 
 
-def send_warning(message: str) -> bool:
+def send_warning(message: str | Exception) -> bool:
     """Send warning level log message."""
 
     return send_log("warning", message)
 
 
-def send_error(message: str) -> bool:
+def send_error(message: str | Exception) -> bool:
     """Send error level log message."""
 
     return send_log("error", message)
 
 
-def send_critical(message: str) -> bool:
+def send_critical(message: str | Exception) -> bool:
     """Send critical level log message."""
 
     return send_log("critical", message)
+
+
+def format_exception_message(e: Exception) -> str:
+    """
+    Format exception message as: file_path:line_number exception_message (EXCEPTION:ExceptionType)
+
+    Args:
+        e: Exception object
+
+    Returns:
+        Formatted exception string
+    """
+    tb = traceback.extract_tb(e.__traceback__)
+    exception_type = type(e).__name__
+    exception_message = str(e)
+
+    if tb:
+        last_frame = tb[-1]
+        file_path = last_frame.filename
+        line_number = last_frame.lineno
+        return f"{file_path}:{line_number} {exception_message} (EXCEPTION:{exception_type})"
+    else:
+        return f"{exception_message} (EXCEPTION:{exception_type})"
+
+
+def format_string_message(message: str) -> str:
+    """
+    Format a string message with filepath and line number by inspecting the call stack.
+
+    Args:
+        message: The log message string
+
+    Returns:
+        Formatted message string
+    """
+    frame = inspect.currentframe().f_back
+    while frame and frame.f_code.co_filename.endswith("logger.py"):
+        frame = frame.f_back
+
+    if frame:
+        filepath = frame.f_code.co_filename
+        line_number = frame.f_lineno
+    else:
+        filepath = "unknown"
+        line_number = 0
+
+    formatted_message = f"[{filepath}:{line_number}] {message}"
+    return formatted_message

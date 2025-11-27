@@ -63,7 +63,8 @@ def send_log(
             timeout=5,
         )
         response.raise_for_status()
-        print("Log sent successfully:", response.text)
+        print("[Alert] Log sent successfully with payload:", payload)
+        print("[Alert] Log sent successfully with response:", response.text)
         return True
     except requests.exceptions.RequestException as err:  # pragma: no cover - network errors
         print("Error sending log:", err)

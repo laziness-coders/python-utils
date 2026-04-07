@@ -18,6 +18,7 @@ import requests
 def send_log(
     level: str,
     message: str | Exception,
+    **fields,
 ) -> bool:
     """
     Send log message to remote logging API.
@@ -25,6 +26,11 @@ def send_log(
     Args:
         level (str): Log level (e.g., 'info', 'warning', 'error', 'critical')
         message (str | Exception): Log message to send or exception to format and log
+        **fields: Additional payload fields forwarded to the logging API
+            (e.g., source, dedup_time, ignore_dedup, or any new field the
+            server adds in the future). Caller-supplied ``dedup_key``
+            overrides the auto-generated one. ``level`` and ``message``
+            cannot be overridden via ``fields``.
 
     Returns:
         bool: True if log was sent successfully, False otherwise
@@ -41,14 +47,13 @@ def send_log(
     else:
         formatted_message = format_string_message(message)
 
-    dedup_key = hashlib.md5(f"{formatted_message}".encode("utf-8")).hexdigest()
+    auto_dedup_key = hashlib.md5(formatted_message.encode("utf-8")).hexdigest()
     formatted_message = f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {formatted_message}"
 
-    payload = {
-        "level": level,
-        "message": formatted_message,
-        "dedup_key": dedup_key,
-    }
+    payload = dict(fields)
+    payload["level"] = level
+    payload["message"] = formatted_message
+    payload.setdefault("dedup_key", auto_dedup_key)
 
     headers = {
         "Authorization": f"Bearer {log_api_key}",
@@ -71,28 +76,28 @@ def send_log(
         return False
 
 
-def send_info(message: str | Exception) -> bool:
-    """Send info level log message."""
+def send_info(message: str | Exception, **fields) -> bool:
+    """Send info level log message. See ``send_log`` for ``**fields``."""
 
-    return send_log("info", message)
-
-
-def send_warning(message: str | Exception) -> bool:
-    """Send warning level log message."""
-
-    return send_log("warning", message)
+    return send_log("info", message, **fields)
 
 
-def send_error(message: str | Exception) -> bool:
-    """Send error level log message."""
+def send_warning(message: str | Exception, **fields) -> bool:
+    """Send warning level log message. See ``send_log`` for ``**fields``."""
 
-    return send_log("error", message)
+    return send_log("warning", message, **fields)
 
 
-def send_critical(message: str | Exception) -> bool:
-    """Send critical level log message."""
+def send_error(message: str | Exception, **fields) -> bool:
+    """Send error level log message. See ``send_log`` for ``**fields``."""
 
-    return send_log("critical", message)
+    return send_log("error", message, **fields)
+
+
+def send_critical(message: str | Exception, **fields) -> bool:
+    """Send critical level log message. See ``send_log`` for ``**fields``."""
+
+    return send_log("critical", message, **fields)
 
 
 def format_exception_message(e: Exception) -> str:

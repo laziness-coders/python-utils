@@ -11,8 +11,15 @@ from python_utils import send_info, send_warning, send_error, send_critical
 def main() -> None:
     send_info("Starting price update pipeline")
     send_warning("Fallback to cached catalog because live source was slow")
-    send_error("Failed to update price for SKU-12345")
-    send_critical("Terminating pipeline after repeated failures")
+    send_error(
+        "Failed to update price for SKU-12345",
+        source="price-pipeline",
+        dedup_time=10,
+    )
+    send_critical(
+        "Terminating pipeline after repeated failures",
+        ignore_dedup=True,
+    )
 
 
 if __name__ == "__main__":

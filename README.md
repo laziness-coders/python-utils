@@ -90,11 +90,24 @@ send_error("Could not fetch product catalog")
 - Uses a short timeout (5 seconds) when contacting the remote API and returns `False` on failure.
 
 ### API
-- `send_log(level: str, message: str) -> bool`
-- `send_info(message: str) -> bool`
-- `send_warning(message: str) -> bool`
-- `send_error(message: str) -> bool`
-- `send_critical(message: str) -> bool`
+- `send_log(level: str, message: str | Exception, **fields) -> bool`
+- `send_info(message: str | Exception, **fields) -> bool`
+- `send_warning(message: str | Exception, **fields) -> bool`
+- `send_error(message: str | Exception, **fields) -> bool`
+- `send_critical(message: str | Exception, **fields) -> bool`
+
+Any extra keyword arguments are forwarded straight into the JSON payload, so new server-side fields can be passed without updating this client:
+
+```python
+send_error(
+    "Failed to update price for SKU-12345",
+    source="price-pipeline",
+    dedup_time=10,
+    ignore_dedup=False,
+)
+```
+
+A caller-supplied `dedup_key` overrides the auto-generated one. `level` and `message` are always set by the function and cannot be overridden via `**fields`.
 
 ## Examples
 

@@ -54,7 +54,7 @@ python-utils @ git+https://github.com/laziness-coders/python-utils.git@main
 Or pin to a specific version/tag:
 
 ```
-python-utils @ git+https://github.com/laziness-coders/python-utils.git@v0.2.0
+python-utils @ git+https://github.com/laziness-coders/python-utils.git@v0.3.0
 ```
 
 Then install with:
